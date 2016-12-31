@@ -29,15 +29,11 @@ module Prestashop
       end
 
       def uploader source
-        if source =~ URI::regexp
-          source = URI::encode(source)
-          self.file = MiniMagick::Image.open(source)
-          file.format 'png' unless %w(jpg jpeg png gif).include?(file[:format])
-          result = Client.upload 'images', resource, id_resource, payload, file
-          result[:image][:id] if result
-        else
-          false # Not valid url
-        end
+        source = URI::encode(source) if source =~ URI::regexp
+        self.file = MiniMagick::Image.open(source)
+        file.format 'png' unless %w(jpg jpeg png gif).include?(file[:format])
+        result = Client.upload 'images', resource, id_resource, payload, file
+        result[:image][:id] if result
       rescue MiniMagick::Invalid
         false # It's not valid image
       rescue OpenURI::HTTPError
